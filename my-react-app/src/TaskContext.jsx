@@ -71,11 +71,28 @@ export function TaskProvider({ children }) {
     }
   };
 
+  const editTask = async (id, text, dueDate) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, dueDate }),
+    });
+    const updatedTask = await response.json();
+    setTasks(tasks.map(task => task._id === id ? updatedTask : task));
+  } catch (error) {
+    console.error("Error editing task:", error);
+  }
+};
+
   return (
-    <TaskContext.Provider value={{ tasks, filter, setFilter, addTask, deleteTask, toggleComplete, loading }}>
-      {children}
-    </TaskContext.Provider>
-  );
+  <TaskContext.Provider value={{ tasks, filter, setFilter, addTask, deleteTask, toggleComplete, editTask, loading }}>
+    {children}
+  </TaskContext.Provider>
+);
 }
 
 export function useTasks() {

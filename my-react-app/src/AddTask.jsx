@@ -8,7 +8,11 @@ function AddTask() {
 
   const handleAdd = () => {
     if (inputValue.trim() === "") return;
-    addTask(inputValue, dueDate || null);
+    
+    // Local time ko sahi se ISO/UTC format mein convert kiya
+    const isoDueDate = dueDate ? new Date(dueDate).toISOString() : null;
+    
+    addTask(inputValue, isoDueDate);
     setInputValue("");
     setDueDate("");
   };
