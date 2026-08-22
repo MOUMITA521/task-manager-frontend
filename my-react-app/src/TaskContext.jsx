@@ -29,7 +29,7 @@ export function TaskProvider({ children }) {
     }
   };
 
-  const addTask = async (text) => {
+  const addTask = async (text,dueDate) => {
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -37,7 +37,7 @@ export function TaskProvider({ children }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, dueDate }),
       });
       const newTask = await response.json();
       setTasks([...tasks, newTask]);
