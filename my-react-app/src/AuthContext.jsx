@@ -37,6 +37,12 @@ export function AuthProvider({ children }) {
     const data = await response.json();
     setToken(data.token);
     localStorage.setItem('token', data.token); // token ko save karo
+
+    // Ask for notification permission (only asks if not already decided)
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
     return data;
   };
 

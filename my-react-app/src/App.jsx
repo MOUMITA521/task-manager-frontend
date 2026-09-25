@@ -1,61 +1,57 @@
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
-import { TaskProvider } from './TaskContext';
-import Login from './Login';
-import Signup from './Signup';
-import AddTask from './AddTask';
-import FilterButtons from './FilterButtons';
-import TaskList from './TaskList';
-import TaskStats from './TaskStats';
-import CalendarView from './CalendarView';
+import Navbar from './Navbar';
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import DashboardPage from './pages/DashboardPage';
+import CalendarPage from './pages/CalendarPage';
 import './App.css';
 
-function MainApp() {
-  const { token, logout } = useAuth();
-  const [showLogin, setShowLogin] = useState(true);
-  const [showCalendar, setShowCalendar] = useState(false);
-
+function ProtectedRoute({ children }) {
+  const { token } = useAuth();
   if (!token) {
-    return showLogin ? (
-      <Login switchToSignup={() => setShowLogin(false)} />
-    ) : (
-      <Signup switchToLogin={() => setShowLogin(true)} />
-    );
+    return <Navigate to="/login" />;
   }
+  return children;
+}
 
+function AppRoutes() {
   return (
-    <TaskProvider>
-      <div className="app-container">
-        <div className="app-header">
-          <h1 className="app-title">📋 Task Manager</h1>
-          <div className="header-buttons">
-            <button className="calendar-toggle-btn" onClick={() => setShowCalendar(!showCalendar)}>
-              {showCalendar ? "📋 List" : "📅 Calendar"}
-            </button>
-            <button className="logout-btn" onClick={logout}>Logout</button>
-          </div>
-        </div>
-
-        {showCalendar ? (
-          <CalendarView />
-        ) : (
-          <>
-            <AddTask />
-            <FilterButtons />
-            <TaskList />
-            <TaskStats />
-          </>
-        )}
-      </div>
-    </TaskProvider>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <ProtectedRoute>
+              <CalendarPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
